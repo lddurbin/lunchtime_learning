@@ -1,8 +1,8 @@
 library(dplyr) # A Grammar of Data Manipulation
 library(ggplot2) # Create Elegant Data Visualisations Using the Grammar of Graphics
 library(readxl) # Read Excel Files
-library(ggtext)
-library(purrr)
+library(ggtext) # Improved Text Rendering Support for 'ggplot2'
+library(purrr) # Functional Programming Tools
 
 path <- here::here("makeovermonday/2022/Week04")
 
@@ -43,3 +43,4 @@ ggplot(data = clean_data) +
     title = "Most of Q4's returned products originated from our warehouses in the<br><strong><span style='color:#ea9d18'>Northeast</span></strong>, but we may have a problem out <strong><span style='color:#87CEEB'>West</span></strong> too",
     caption = "Number of errors recorded per warehouse via ProTip dashboard in Q4 2021"
   )
+
