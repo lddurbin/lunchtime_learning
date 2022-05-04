@@ -1,38 +1,45 @@
 library(dplyr) # A Grammar of Data Manipulation
 library(ggplot2) # Create Elegant Data Visualisations Using the Grammar of Graphics
 library(readxl) # Read Excel Files
+library(ggtext)
+library(purrr)
 
 path <- here::here("makeovermonday/2022/Week04")
 
 clean_data <- read_excel(fs::dir_ls(path, glob = "*.xlsx"), range = "J5:R24", .name_repair = janitor::make_clean_names) |>  
   rename(region = x, null_rate = null_2) |> 
-  mutate(warehouse_id = as.character(warehouse_id))
-
-northeast_or_not <- clean_data |>
-  mutate(error_prone_northeast = if_else(warehouse_id %in% c("2", "3", "4", "5", "6"), TRUE, FALSE)) |>
-  with_groups(error_prone_northeast, summarise, total_error = sum(errors))
-
-avg_regional_errors <- clean_data |>
-  group_by(region) |>
-  summarise(total_errors = sum(errors), sites = n(), avg_errors = mean(errors)) |> 
-  mutate(regional_avg = sum(total_errors)/sum(sites))
+  mutate(
+    warehouse_id = as.character(warehouse_id),
+    national_avg = sum(errors)/n(),
+    region = factor(region, levels = c("Northeast", "West", "South", "Midwest")),
+    border_colour = if_else(region %in% c("Northeast", "Midwest"), "black", "white"),
+    region_num = case_when(
+      region == "Midwest" ~ 1,
+      region == "West" ~ 2,
+      region == "South" ~ 3,
+      region == "Midwest" ~ 4
+    )
+    )
 
 ggplot(data = clean_data) +
-  geom_point(aes(x = region, y = errors, colour = region), size = 5) +
-  scale_colour_manual(values = c("grey", "orange", "blue", "black")) +
+  geom_point(aes(x = forcats::fct_rev(region), y = errors), colour = "black", pch = 21, size = 6.5) +
+  geom_point(aes(x = forcats::fct_rev(region), y = errors, fill = region), pch = 21, size = 6) +
+  scale_fill_manual(values = c("#ea9d18", "#87CEEB", "yellow", "grey")) +
   coord_flip() +
-  geom_hline(yintercept = 50.6, linetype = "dashed") +
+  annotate(geom = "segment", x = 0.8, xend = 4.2, y = 50.6, yend = 50.6, linetype = "dashed") +
+  annotate(geom = "text", x = 4.3, y = 50.6, label = "National average", size = 5) +
   theme_minimal() +
   theme(
     legend.position = "none",
     axis.title = element_blank(),
-    axis.text.x = element_blank(),
-    axis.text.y = element_text(size=14),
+    axis.text.x = element_text(size=12),
+    axis.text.y = element_text(size=15),
     panel.grid.major.x = element_blank(),
     panel.grid.minor.x = element_blank(),
     plot.title.position = "plot",
-    plot.title = element_text(size=18)
+    plot.title = element_markdown(lineheight = 1.2, size = 21)
   ) +
   labs(
-    title = "Most of the errors are coming out our warehouses in the Northeast, but we may have a problem out West too"
+    title = "Most of Q4's returned products originated from our warehouses in the<br><strong><span style='color:#ea9d18'>Northeast</span></strong>, but we may have a problem out <strong><span style='color:#87CEEB'>West</span></strong> too",
+    caption = "Number of errors recorded per warehouse via ProTip dashboard in Q4 2021"
   )

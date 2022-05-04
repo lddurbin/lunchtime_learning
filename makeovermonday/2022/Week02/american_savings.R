@@ -2,7 +2,7 @@ library(dplyr) # A Grammar of Data Manipulation
 library(ggplot2) # Create Elegant Data Visualisations Using the Grammar of Graphics
 library(stringr) # Simple, Consistent Wrappers for Common String Operations
 
-data <- readr::read_csv("makeovermonday/2016/Week 4/disaggregated_data.csv")
+data <- readr::read_csv("makeovermonday/2022/Week02/disaggregated_data.csv")
 
 american_savings <- data %>% 
   mutate(
