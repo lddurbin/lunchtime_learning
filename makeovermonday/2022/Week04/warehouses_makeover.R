@@ -21,7 +21,7 @@ clean_data <- read_excel(fs::dir_ls(path, glob = "*.xlsx"), range = "J5:R24", .n
     )
     )
 
-ggplot(data = clean_data) +
+plot <-ggplot(data = clean_data) +
   geom_point(aes(x = forcats::fct_rev(region), y = errors), colour = "black", pch = 21, size = 6.5) +
   geom_point(aes(x = forcats::fct_rev(region), y = errors, fill = region), pch = 21, size = 6) +
   scale_fill_manual(values = c("#ea9d18", "#87CEEB", "yellow", "grey")) +
@@ -37,10 +37,12 @@ ggplot(data = clean_data) +
     panel.grid.major.x = element_blank(),
     panel.grid.minor.x = element_blank(),
     plot.title.position = "plot",
-    plot.title = element_markdown(lineheight = 1.2, size = 21)
+    plot.title = element_markdown(lineheight = 1.2, size = 21),
+    plot.background = element_rect(colour = "white")
   ) +
   labs(
     title = "Most of Q4's returned products originated from our warehouses in the<br><strong><span style='color:#ea9d18'>Northeast</span></strong>, but we may have a problem out <strong><span style='color:#87CEEB'>West</span></strong> too",
     caption = "Number of errors recorded per warehouse via ProTip dashboard in Q4 2021"
   )
 
+ggsave("warehouse_errors.png", plot, device = "png", path = path)
